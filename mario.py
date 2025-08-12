@@ -1,5 +1,6 @@
 import pygame
 import sys
+from cenario import desenhar_cenario_especial
 
 # Inicialização
 pygame.init()
@@ -135,10 +136,17 @@ while True:
                     on_ground = True
         else:
             # No cenário vazio, Mario para no chão da tela
-            if mario.y + mario.height >= HEIGHT:
-                mario.y = HEIGHT - mario.height
+            if mario.y + mario.height >= HEIGHT - 40:
+                mario.y = HEIGHT - 40 - mario.height
                 y_velocity = 0
                 on_ground = True
+            # Blocos suspensos do cenário especial
+            blocos, goomba_rect, koopa_rect = desenhar_cenario_especial(screen, WIDTH, HEIGHT)
+            for bloco in blocos:
+                if mario.colliderect(bloco) and y_velocity >= 0:
+                    mario.y = bloco.y - mario.height
+                    y_velocity = 0
+                    on_ground = True
 
         # Movimento dos inimigos (apenas se não estiver no cenário vazio)
         if not cenario_vazio:
@@ -155,6 +163,10 @@ while True:
                         y_velocity = -12
                     else:
                         game_over = True
+        else:
+            # Colisão com inimigos do cenário especial
+            if mario.colliderect(goomba_rect) or mario.colliderect(koopa_rect):
+                game_over = True
 
         # Limites da tela
         if mario.x < 0:
@@ -169,71 +181,8 @@ while True:
             y_velocity = 0
 
     # Desenho
-    # ...código anterior permanece igual...
-
-    # Desenho
     if cenario_vazio:
-        # --- Novo cenário vazio com layout inspirado no Mario ---
-        screen.fill((107, 140, 255))  # Azul do céu Mario
-
-        # Chão de blocos
-        for i in range(0, WIDTH, 40):
-            pygame.draw.rect(screen, (188, 108, 37), (i, HEIGHT - 40, 40, 40))  # Blocos do chão
-            pygame.draw.rect(screen, (222, 173, 110), (i+5, HEIGHT - 35, 30, 10))  # Detalhe claro
-
-        # Blocos suspensos (linha do meio)
-        blocos = [
-            pygame.Rect(WIDTH//2 - 60, HEIGHT - 160, 40, 40),
-            pygame.Rect(WIDTH//2 - 20, HEIGHT - 160, 40, 40),
-            pygame.Rect(WIDTH//2 + 20, HEIGHT - 160, 40, 40),
-        ]
-        for bloco in blocos:
-            pygame.draw.rect(screen, (188, 108, 37), bloco)
-            pygame.draw.rect(screen, (255, 221, 77), (bloco.x+10, bloco.y+10, 20, 20))  # Detalhe do bloco ?
-
-        # Moeda acima do bloco central
-        pygame.draw.circle(screen, (255, 215, 0), (WIDTH//2 + 20, HEIGHT - 180), 10)
-
-        # Inimigos: Goomba e Koopa
-        goomba_rect = pygame.Rect(WIDTH//2 + 60, HEIGHT - 80, 32, 32)
-        koopa_rect = pygame.Rect(WIDTH//2 + 110, HEIGHT - 80, 32, 32)
-        # Goomba (marrom)
-        pygame.draw.ellipse(screen, (139, 69, 19), goomba_rect)
-        pygame.draw.rect(screen, (0, 0, 0), (goomba_rect.x+8, goomba_rect.y+24, 16, 8))  # Pés
-        # Koopa (verde)
-        pygame.draw.ellipse(screen, (0, 200, 0), koopa_rect)
-        pygame.draw.rect(screen, (255, 255, 255), (koopa_rect.x+8, koopa_rect.y+24, 16, 8))  # Pés
-
-        # Nuvens
-        pygame.draw.ellipse(screen, (255, 255, 255), (80, 60, 60, 30))
-        pygame.draw.ellipse(screen, (255, 255, 255), (WIDTH-140, 40, 60, 30))
-
-        # Arbusto
-        pygame.draw.ellipse(screen, (0, 200, 0), (WIDTH//2 - 80, HEIGHT - 60, 60, 30))
-        pygame.draw.ellipse(screen, (0, 200, 0), (WIDTH//2 - 50, HEIGHT - 70, 60, 40))
-
-        # Texto informativo
-        font_vazio = pygame.font.SysFont(None, 40)
-        txt_vazio = font_vazio.render("Cenário especial! Pressione R para reiniciar.", True, (0, 0, 0))
-        screen.blit(txt_vazio, (WIDTH//2 - 260, 20))
-
-        # --- Colisão com chão e blocos suspensos ---
-        on_ground = False
-        # Chão
-        if mario.y + mario.height >= HEIGHT - 40:
-            mario.y = HEIGHT - 40 - mario.height
-            y_velocity = 0
-            on_ground = True
-        # Blocos suspensos
-        for bloco in blocos:
-            if mario.colliderect(bloco) and y_velocity >= 0:
-                mario.y = bloco.y - mario.height
-                y_velocity = 0
-                on_ground = True
-
-        # --- Colisão com inimigos do cenário especial ---
-        if mario.colliderect(goomba_rect) or mario.colliderect(koopa_rect):
-            game_over = True
+        blocos, goomba_rect, koopa_rect = desenhar_cenario_especial(screen, WIDTH, HEIGHT)
 
     else:
         screen.fill(BLUE)
@@ -268,4 +217,3 @@ while True:
 
     pygame.display.flip()
     clock.tick(50)
-# ...código posterior permanece igual...
