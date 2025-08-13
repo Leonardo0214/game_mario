@@ -8,7 +8,7 @@ def desenhar_cenario_especial(screen, WIDTH, HEIGHT):
 
     # Blocos suspensos (linha do meio)
     blocos = [
-        pygame.Rect(WIDTH//2 - 60, HEIGHT - 160, 40, 40)
+        pygame.Rect(WIDTH//2 - 60, HEIGHT - 160, 40, 40),
         pygame.Rect(WIDTH//2 - 20, HEIGHT - 160, 40, 40),
         pygame.Rect(WIDTH//2 + 20, HEIGHT - 160, 40, 40),
     ]
